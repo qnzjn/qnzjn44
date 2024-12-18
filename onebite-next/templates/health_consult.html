@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}AI PetCare - AI 건강상담{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="chat-section">
+        <h1>AI 반려동물 건강상담</h1>
+        <p class="chat-intro">반려동물의 건강 고민을 AI 전문가와 상담해보세요</p>
+        
+        <div class="chat-container">
+            <div class="chat-messages" id="chatMessages">
+                <div class="message ai-message">
+                    <div class="message-content">
+                        안녕하세요! 반려동물의 건강에 대해 어떤 고민이 있으신가요?
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chat-input-container">
+                <textarea 
+                    id="userInput" 
+                    placeholder="질문을 입력하세요..."
+                    rows="3"
+                ></textarea>
+                <button id="sendButton" class="send-button">
+                    전송
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const chatMessages = document.getElementById('chatMessages');
+    const userInput = document.getElementById('userInput');
+    const sendButton = document.getElementById('sendButton');
+
+    function addMessage(content, isAi = false) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${isAi ? 'ai-message' : 'user-message'}`;
+        
+        const contentDiv = document.createElement('div');
+        contentDiv.className = 'message-content';
+        contentDiv.textContent = content;
+        
+        messageDiv.appendChild(contentDiv);
+        chatMessages.appendChild(messageDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    async function sendMessage() {
+        const message = userInput.value.trim();
+        if (!message) return;
+
+        // 사용자 메시지 표시
+        addMessage(message, false);
+        userInput.value = '';
+
+        try {
+            const response = await fetch('/get-ai-response', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ message: message })
+            });
+
+            const data = await response.json();
+            if (data.error) {
+                throw new Error(data.error);
+            }
+
+            // AI 응답 표시
+            addMessage(data.response, true);
+        } catch (error) {
+            addMessage('죄송합니다. 오류가 발생했습니다. 다시 시도해주세요.', true);
+        }
+    }
+
+    sendButton.addEventListener('click', sendMessage);
+    userInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
+    });
+});
+</script>
+{% endblock %} 

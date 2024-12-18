@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}AI PetCare - 응급상황 가이드{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="emergency-section">
+        <h1>응급상황 대처 가이드</h1>
+        <div class="emergency-grid">
+            <div class="emergency-card urgent">
+                <h2>즉시 병원 방문이 필요한 상황</h2>
+                <ul>
+                    <li>심한 출혈</li>
+                    <li>호흡 곤란</li>
+                    <li>의식 불명</li>
+                    <li>심한 구토/설사</li>
+                    <li>경련/발작</li>
+                </ul>
+                <div class="emergency-action">
+                    <strong>조치:</strong> 즉시 가까운 24시 동물병원으로 이동
+                </div>
+            </div>
+            
+            <div class="emergency-card first-aid">
+                <h2>응급 처치가 필요한 상황</h2>
+                <ul>
+                    <li>경미한 상처/찰과상</li>
+                    <li>가벼운 화상</li>
+                    <li>벌레 물림</li>
+                    <li>경미한 알레르기 반응</li>
+                </ul>
+                <div class="emergency-action">
+                    <strong>조치:</strong> 기본 응급처치 후 수의사 상담
+                </div>
+            </div>
+            
+            <div class="emergency-card prevention">
+                <h2>예방 수칙</h2>
+                <ul>
+                    <li>응급처치 키트 구비</li>
+                    <li>주변 24시 병원 위치 파악</li>
+                    <li>정기 건강검진 실시</li>
+                    <li>위험물질 접근 차단</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

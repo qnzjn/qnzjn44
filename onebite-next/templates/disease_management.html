@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}AI PetCare - 질병 관리{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="disease-section">
+        <h1>반려동물 질병 관리</h1>
+        <div class="disease-nav">
+            <a href="{{ url_for('allergy_info') }}" class="disease-nav-item">
+                <div class="icon">🦮</div>
+                알레르기 정보
+            </a>
+            <a href="{{ url_for('emergency_guide') }}" class="disease-nav-item">
+                <div class="icon">🏥</div>
+                응급상황 가이드
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}회원탈퇴{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="auth-form-container">
+        <h1>회원탈퇴</h1>
+        
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-info">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <div class="withdraw-warning">
+            <p>⚠️ 주의사항</p>
+            <ul>
+                <li>탈퇴 시 모든 데이터가 삭제되며 복구할 수 없습니다.</li>
+                <li>작성한 게시글과 댓글은 삭제되지 않습니다.</li>
+                <li>탈퇴 후 동일한 아이디로 재가입이 가능합니다.</li>
+            </ul>
+        </div>
+        
+        <form method="POST" class="auth-form">
+            <div class="form-group">
+                <label for="password">비밀번호 확인</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            
+            <button type="submit" class="withdraw-submit">회원탈퇴</button>
+        </form>
+        
+        <div class="auth-links">
+            <a href="{{ url_for('home') }}">취소하기</a>
+        </div>
+    </div>
+</div>
+{% endblock %} 

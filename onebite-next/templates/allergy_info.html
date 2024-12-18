@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}AI PetCare - 알레르기 정보{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="allergy-section">
+        <h1>반려동물 알레르기 정보</h1>
+        <div class="allergy-grid">
+            <div class="allergy-card">
+                <h2>음식 알레르기</h2>
+                <ul>
+                    <li>닭고기, 소고기, 생선</li>
+                    <li>유제품, 계란</li>
+                    <li>밀, 콩, 옥수수</li>
+                </ul>
+                <p>증상: 피부 가려움, 구토, 설사</p>
+            </div>
+            <div class="allergy-card">
+                <h2>환경성 알레르기</h2>
+                <ul>
+                    <li>꽃가루, 잔디</li>
+                    <li>집먼지 진드기</li>
+                    <li>곰팡이 포자</li>
+                </ul>
+                <p>증상: 재채기, 기침, 피부 발진</p>
+            </div>
+            <div class="allergy-card">
+                <h2>접촉성 알레르기</h2>
+                <ul>
+                    <li>세제, 샴푸</li>
+                    <li>합성 섬유</li>
+                    <li>플라스틱 용품</li>
+                </ul>
+                <p>증상: 피부 발적, 가려움</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

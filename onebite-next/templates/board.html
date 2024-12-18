@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}AI PetCare - 자유게시판{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="board-section">
+        <h1>자유게시판</h1>
+        <div class="board-header">
+            <form class="board-search" method="GET" action="{{ url_for('board') }}">
+                <input type="text" 
+                       name="search" 
+                       placeholder="제목, 내용, 작성자 검색" 
+                       class="search-input"
+                       value="{{ search_query if search_query else '' }}">
+                <button type="submit" class="search-button">검색</button>
+                {% if search_query %}
+                    <a href="{{ url_for('board') }}" class="reset-button">초기화</a>
+                {% endif %}
+            </form>
+            <a href="{{ url_for('write_post') }}" class="write-button">글쓰기</a>
+        </div>
+        
+        <div class="board-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>번호</th>
+                        <th>제목</th>
+                        <th>작성자</th>
+                        <th>작성일</th>
+                        <th>조회</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if posts|length > 0 %}
+                        {% for post in posts|reverse %}
+                        <tr>
+                            <td>{{ post.id }}</td>
+                            <td>
+                                <a href="{{ url_for('view_post', post_id=post.id) }}">
+                                    {{ post.title }}
+                                    {% if post.image_url %}
+                                        <span class="has-image">📷</span>
+                                    {% endif %}
+                                </a>
+                            </td>
+                            <td>{{ post.author }}</td>
+                            <td>{{ post.date }}</td>
+                            <td>{{ post.views }}</td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="5" class="no-results">
+                                {% if search_query %}
+                                    검색 결과가 없습니다.
+                                {% else %}
+                                    등록된 게시글이 없습니다.
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if total_pages > 1 %}
+        <div class="board-pagination">
+            {% if current_page > 1 %}
+                <a href="{{ url_for('board', page=current_page-1, search=search_query) }}" class="page-link">이전</a>
+            {% endif %}
+
+            {% for p in range(1, total_pages + 1) %}
+                <a href="{{ url_for('board', page=p, search=search_query) }}" 
+                   class="page-link {% if p == current_page %}active{% endif %}">
+                    {{ p }}
+                </a>
+            {% endfor %}
+
+            {% if current_page < total_pages %}
+                <a href="{{ url_for('board', page=current_page+1, search=search_query) }}" class="page-link">다음</a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %} 

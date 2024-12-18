@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+
+{% block title %}프로필 수정{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="edit-profile-section">
+        <h1>프로필 수정</h1>
+        
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-info">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <form method="POST" class="edit-profile-form" enctype="multipart/form-data">
+            <div class="profile-image-upload">
+                <div class="current-profile-image">
+                    {% if user.profile_image %}
+                        <img src="{{ url_for('static', filename=user.profile_image) }}" alt="프재 프로필 이미지">
+                    {% else %}
+                        <div class="profile-placeholder">👤</div>
+                    {% endif %}
+                </div>
+                
+                <label for="profile_image" class="profile-upload-button">
+                    <span>📷</span> 프로필 사진 변경
+                </label>
+                <input type="file" id="profile_image" name="profile_image" accept="image/*" class="image-input">
+                
+                <div id="image-preview" class="image-preview">
+                    <!-- 미리보기 이미지가 여기에 표시됩니다 -->
+                </div>
+                
+                <p class="upload-text">* JPG, PNG 파일 (최대 5MB)</p>
+            </div>
+            
+            <div class="form-group">
+                <label for="nickname">닉네임</label>
+                <input type="text" id="nickname" name="nickname" 
+                       value="{{ user.nickname }}" required
+                       minlength="2" maxlength="10">
+                <small class="form-text">2-10자의 닉네임을 사용하세요</small>
+                <span class="validation-message" id="nicknameMessage"></span>
+            </div>
+            
+            <div class="form-group">
+                <label for="bio">자기소개</label>
+                <textarea id="bio" name="bio" rows="3" placeholder="간단한 자기소개를 입력해주세요">{{ user.bio or '' }}</textarea>
+                <small class="form-text">최대 200자까지 입력 가능합니다</small>
+            </div>
+            
+            <div class="form-buttons">
+                <button type="submit" class="save-button">저장</button>
+                <a href="{{ url_for('profile') }}" class="cancel-button">취소</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+document.getElementById('profile_image').addEventListener('change', function(e) {
+    const preview = document.getElementById('image-preview');
+    preview.innerHTML = '';
+    
+    if (this.files && this.files[0]) {
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            preview.classList.add('show');
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            img.className = 'preview-image';
+            preview.appendChild(img);
+        }
+        
+        reader.readAsDataURL(this.files[0]);
+    } else {
+        preview.classList.remove('show');
+    }
+});
+
+document.getElementById('nickname').addEventListener('input', function() {
+    const messageSpan = document.getElementById('nicknameMessage');
+    const currentNickname = "{{ user.nickname }}";  // 현재 사용자의 닉네임
+    const newNickname = this.value.trim();
+    
+    // 입력값이 없거나 현재 닉네임과 같으면 검사 스킵
+    if (!newNickname || newNickname === currentNickname) {
+        messageSpan.textContent = '';
+        messageSpan.className = 'validation-message';
+        this.setCustomValidity('');
+        return;
+    }
+    
+    // 닉네임 유효성 검사
+    if (newNickname.length < 2 || newNickname.length > 10) {
+        messageSpan.textContent = '닉네임은 2-10자로 입력해주세요.';
+        messageSpan.className = 'validation-message error';
+        this.setCustomValidity('invalid');
+        return;
+    }
+    
+    // 서버에 중복 검사 요청
+    fetch(`/check-duplicate?field=nickname&value=${encodeURIComponent(newNickname)}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.exists) {
+                messageSpan.textContent = '이미 사용 중인 닉네임입니다.';
+                messageSpan.className = 'validation-message error';
+                this.setCustomValidity('duplicate');
+            } else {
+                messageSpan.textContent = '사용 가능한 닉네임입니다.';
+                messageSpan.className = 'validation-message success';
+                this.setCustomValidity('');
+            }
+        });
+});
+
+document.querySelector('.edit-profile-form').addEventListener('submit', function(e) {
+    const nicknameInput = document.getElementById('nickname');
+    if (nicknameInput.validity.customError) {
+        e.preventDefault();
+        alert('닉네임을 확인해주세요.');
+    }
+});
+</script>
+{% endblock %} 

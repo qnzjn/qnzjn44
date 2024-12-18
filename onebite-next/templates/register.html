@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}회원가입{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="auth-form-container">
+        <h1>회원가입</h1>
+        
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-info">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <form method="POST" class="auth-form" id="registerForm">
+            <div class="form-group">
+                <label for="username">아이디</label>
+                <input type="text" id="username" name="username" required 
+                       minlength="4" maxlength="20" pattern="[a-zA-Z0-9]+"
+                       title="4-20자의 영문자와 숫자만 사용 가능합니다">
+                <small class="form-text">4-20자의 영문자와 숫자를 사용하세요</small>
+                <span class="validation-message" id="usernameMessage"></span>
+            </div>
+            
+            <div class="form-group">
+                <label for="nickname">닉네임</label>
+                <input type="text" id="nickname" name="nickname" required
+                       minlength="2" maxlength="10">
+                <small class="form-text">2-10자의 닉네임을 사용하세요</small>
+                <span class="validation-message" id="nicknameMessage"></span>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">이메일</label>
+                <input type="email" id="email" name="email" required>
+                <span class="validation-message" id="emailMessage"></span>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">비밀번호</label>
+                <input type="password" id="password" name="password" required
+                       minlength="6" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,}"
+                       title="영문 대소문자와 숫자를 포함하여 6자 이상 입력하세요">
+                <small class="form-text">영문 대소문자와 숫자를 포함하여 6자 이상 입력하세요</small>
+            </div>
+            
+            <button type="submit" class="auth-submit" id="submitButton">회원가입</button>
+        </form>
+        
+        <div class="auth-links">
+            <p>이미 계정이 있으신가요? <a href="{{ url_for('login') }}">로그인</a></p>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('registerForm');
+    const submitButton = document.getElementById('submitButton');
+    let timeouts = {};
+    
+    // 입력 필드 실시간 검사
+    ['username', 'nickname', 'email'].forEach(field => {
+        const input = document.getElementById(field);
+        const messageSpan = document.getElementById(field + 'Message');
+        
+        input.addEventListener('input', function() {
+            // 이전 타이머 취소
+            if (timeouts[field]) clearTimeout(timeouts[field]);
+            
+            // 새로운 타이머 설정 (타이핑 후 0.5초 후에 검사)
+            timeouts[field] = setTimeout(() => {
+                const value = this.value.trim();
+                if (!value) return;
+                
+                // 서버에 중복 검사 요청
+                fetch(`/check-duplicate?field=${field}&value=${value}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.exists) {
+                            messageSpan.textContent = `이미 사용 중인 ${field === 'username' ? '아이디' : field === 'nickname' ? '닉네임' : '이메일'}입니다.`;
+                            messageSpan.className = 'validation-message error';
+                            input.setCustomValidity('duplicate');
+                        } else {
+                            messageSpan.textContent = '사용 가능합니다.';
+                            messageSpan.className = 'validation-message success';
+                            input.setCustomValidity('');
+                        }
+                    });
+            }, 500);
+        });
+    });
+});
+</script>
+{% endblock %} 

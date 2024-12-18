@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}{{ user.nickname }}님의 프로필{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="profile-section">
+        <div class="profile-header">
+            <div class="profile-info">
+                <div class="profile-image">
+                    {% if user.profile_image %}
+                        <img src="{{ url_for('static', filename=user.profile_image) }}" alt="프로필 이미지">
+                    {% else %}
+                        <div class="profile-placeholder">👤</div>
+                    {% endif %}
+                </div>
+                <div class="profile-text">
+                    <h1>{{ user.nickname }}님의 프로필</h1>
+                    {% if user.bio %}
+                        <div class="profile-bio">
+                            {{ user.bio }}
+                        </div>
+                    {% endif %}
+                    <div class="profile-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">게시글</span>
+                            <span class="stat-value">{{ post_count }}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">댓글</span>
+                            <span class="stat-value">{{ comment_count }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="recent-activities">
+            <h2>최근 작성한 게시글</h2>
+            {% if recent_posts %}
+                <div class="activity-list">
+                    {% for post in recent_posts|reverse %}
+                    <div class="activity-item">
+                        <a href="{{ url_for('view_post', post_id=post.id) }}" class="activity-link">
+                            <span class="activity-title">{{ post.title }}</span>
+                            <span class="activity-date">{{ post.date }}</span>
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="no-activities">아직 작성한 게시글이 없습니다.</p>
+            {% endif %}
+        </div>
+
+        <!-- 프로필 댓글 섹션 -->
+        <div class="profile-comments-section">
+            <h2>방명록</h2>
+            
+            <!-- 댓글 작성 폼 -->
+            {% if 'user_id' in session and session['user_id'] != username %}
+            <form class="profile-comment-form" method="POST" action="{{ url_for('add_profile_comment', username=username) }}">
+                <div class="form-group">
+                    <textarea name="content" placeholder="방명록을 남겨보세요" required></textarea>
+                </div>
+                <button type="submit" class="comment-submit">등록</button>
+            </form>
+            {% endif %}
+            
+            <!-- 댓글 목록 -->
+            <div class="profile-comments-list">
+                {% set profile_user_comments = profile_comments|selectattr('profile_username', 'equalto', username)|list %}
+                {% if profile_user_comments %}
+                    {% for comment in profile_user_comments|reverse %}
+                    <div class="profile-comment">
+                        <div class="comment-header">
+                            <a href="{{ url_for('user_profile', username=comment.author_username) }}" class="author-link">{{ comment.author }}</a>
+                            <span class="comment-date">{{ comment.date }}</span>
+                            {% if 'user_id' in session and session['user_id'] == comment.author_username %}
+                            <form method="POST" action="{{ url_for('delete_profile_comment', username=username, comment_id=comment.id) }}" class="delete-form">
+                                <button type="submit" class="comment-delete">삭제</button>
+                            </form>
+                            {% endif %}
+                        </div>
+                        <div class="comment-content">
+                            {{ comment.content }}
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="no-comments">아직 방명록이 없습니다.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

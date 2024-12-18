@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block title %}AI PetCare - 글쓰기{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="write-section">
+        <h1>글쓰기</h1>
+        
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-danger">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <form method="POST" class="write-form" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="title">제목</label>
+                <input type="text" id="title" name="title" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="content">내용</label>
+                <textarea id="content" name="content" rows="10" required></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="image">이미지 첨부</label>
+                <div class="image-upload-container">
+                    <label for="image" class="upload-button">
+                        <span class="upload-icon">📷</span>
+                        이미지 선택하기
+                    </label>
+                    <input type="file" id="image" name="image" accept="image/*" class="image-input">
+                    <div id="image-preview" class="image-preview"></div>
+                    <small class="selected-file-name"></small>
+                </div>
+                <small class="form-text">* 선택사항입니다. (jpg, jpeg, png, gif 파일만 가능)</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">비밀번호</label>
+                <input type="password" id="password" name="password" required>
+                <small class="form-text">게시글 삭제 시 필요합니다.</small>
+            </div>
+            
+            <div class="form-buttons">
+                <button type="submit" class="submit-button">등록</button>
+                <a href="{{ url_for('board') }}" class="cancel-button">취소</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+// 이미지 미리보기 기능
+document.getElementById('image').addEventListener('change', function(e) {
+    const preview = document.getElementById('image-preview');
+    const fileNameDisplay = document.querySelector('.selected-file-name');
+    preview.innerHTML = '';
+    
+    if (this.files && this.files[0]) {
+        const file = this.files[0];
+        
+        // 파일 크기 체크 (16MB 제한)
+        if (file.size > 16 * 1024 * 1024) {
+            alert('파일 크기는 16MB를 초과할 수 없습니다.');
+            this.value = '';
+            return;
+        }
+        
+        // 파일 형식 체크
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/jpg'];
+        if (!allowedTypes.includes(file.type)) {
+            alert('허용된 이미지 형식이 아닙니다. (jpg, jpeg, png, gif 파일만 가능)');
+            this.value = '';
+            return;
+        }
+        
+        // 파일 이름 표시
+        if (fileNameDisplay) {
+            fileNameDisplay.textContent = `선택된 파일: ${file.name}`;
+        }
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            img.className = 'preview-image';
+            preview.appendChild(img);
+            preview.style.display = 'flex';  // 미리보기 표시
+        }
+        
+        reader.readAsDataURL(file);
+    } else {
+        if (fileNameDisplay) {
+            fileNameDisplay.textContent = '';
+        }
+        preview.style.display = 'none';  // 미리보기 숨기기
+    }
+});
+</script>
+{% endblock %} 

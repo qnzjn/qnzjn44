@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <a href="{{ url_for('home') }}">AI PetCare</a>
+            </div>
+            <div class="nav-center">
+                <ul class="nav-links">
+                    <li><a href="{{ url_for('home') }}">소개</a></li>
+                    <li><a href="{{ url_for('services') }}" class="nav-item">서비스</a></li>
+                    <li><a href="{{ url_for('health_consult') }}" class="nav-item">AI 건강상담</a></li>
+                    <li><a href="{{ url_for('disease_management') }}" class="nav-item">질병 관리</a></li>
+                    <li><a href="{{ url_for('board') }}" class="nav-item">자유게시판</a></li>
+                </ul>
+            </div>
+            <div class="auth-buttons">
+                {% if 'user_id' in session %}
+                    <div class="user-menu">
+                        <span class="user-info {% if 'guest_' in session['user_id'] %}guest{% endif %}">
+                            {{ users[session['user_id']]['nickname'] }}님
+                        </span>
+                        <div class="user-dropdown">
+                            {% if 'guest_' not in session['user_id'] %}
+                                <a href="{{ url_for('profile') }}" class="auth-btn">프로필</a>
+                                <a href="{{ url_for('edit_profile') }}" class="auth-btn">프로필 수정</a>
+                            {% endif %}
+                            <a href="{{ url_for('logout') }}" class="auth-btn">로그아웃</a>
+                            {% if 'guest_' not in session['user_id'] %}
+                                <a href="{{ url_for('withdraw') }}" class="auth-btn withdraw-btn">회원탈퇴</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% else %}
+                    <a href="{{ url_for('login') }}" class="auth-btn login-btn">로그인</a>
+                    <a href="{{ url_for('register') }}" class="auth-btn register-btn">회원가입</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+    
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+</body>
+</html> 
